@@ -114,7 +114,7 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
   }
 
   Future<String?> _fetchImageData(String word) async {
-    final baseUrl = "https://content2.mcqstudy.com/ba2/";
+    const baseUrl = "https://content2.mcqstudy.com/ba2/";
     final imageUrl = "$baseUrl${word.toUpperCase()}.JPG.webp";
     
     try {
@@ -158,29 +158,204 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
     });
   }
 
+  // Add a field to store the image provider
+  final NetworkImage _profileImage = const NetworkImage('https://avatars.githubusercontent.com/u/94497807?v=4');
+
   void _showDeveloperInfo() {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Developer Info'),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.blue.shade50,
+                Colors.white,
+              ],
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 4,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.blue.shade100.withOpacity(0.5),
+                          blurRadius: 12,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: Image(
+                        image: _profileImage,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          color: Colors.blue.shade100,
+                          child: Icon(
+                            Icons.person,
+                            size: 60,
+                            color: Colors.blue.shade800,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade800,
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white,
+                          width: 2,
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.code_rounded,
+                        color: Colors.white,
+                        size: 20,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'Mamun Abdullah',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue.shade900,
+                ),
+              ),
+              Text(
+                'Developer',
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.blue.shade800,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Container(
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.blue.shade100.withOpacity(0.3),
+                      blurRadius: 12,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    _buildInfoRow(
+                      Icons.rocket_launch_rounded,
+                      'Version 1.0.0',
+                      'Latest Release',
+                    ),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 12),
+                      child: Divider(),
+                    ),
+                    _buildInfoRow(
+                      Icons.email_outlined,
+                      'a.a.mamun595@gmail.com',
+                      'Contact Email',
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: TextButton.styleFrom(
+                        backgroundColor: Colors.blue.shade800,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Close',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(IconData icon, String text, String label) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.grey.shade600,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Row(
           children: [
-            Text('Developed by: Mamun Abdullah'),
-            SizedBox(height: 8),
-            Text('Version: 1.0.0'),
-            SizedBox(height: 8),
-            Text('Contact: a.a.mamun595@gmail.com'),
+            Icon(
+              icon,
+              size: 20,
+              color: Colors.blue.shade800,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Colors.blue.shade900,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
           ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
+      ],
     );
   }
 
@@ -452,7 +627,7 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
                         wordData['word'].toString().toUpperCase(),
                         style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                           fontWeight: FontWeight.w900,
-                          fontSize: 36,
+                          fontSize: 30,
                           color: const Color(0xFF1A237E),
                           letterSpacing: 1.2,
                           shadows: [
@@ -509,30 +684,31 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
             Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
+                  begin: Alignment.topRight,
+                  end: Alignment.bottomLeft,
                   colors: [
-                    Colors.blue.shade100.withOpacity(0.4),
-                    Colors.white.withOpacity(0.95),
-                    Colors.indigo.shade50.withOpacity(0.3),
+                    Colors.white,
+                    Colors.blue.shade50.withOpacity(0.5),
                   ],
-                  stops: const [0.2, 0.6, 0.9],
+                  stops: const [0.2, 1.0],
                 ),
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(28),
                 border: Border.all(
-                  color: Colors.blue.shade50,
-                  width: 1.5,
+                  color: Colors.blue.shade50.withOpacity(0.5),
+                  width: 1.0,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.white,
-                    spreadRadius: 5,
-                    blurRadius: 15,
+                    color: Colors.blue.withOpacity(0.08),
+                    blurRadius: 25,
+                    offset: const Offset(0, 10),
+                    spreadRadius: 0,
                   ),
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
+                    color: Colors.white.withOpacity(0.5),
+                    blurRadius: 20,
+                    offset: const Offset(-15, -15),
+                    spreadRadius: 1,
                   ),
                 ],
               ),
@@ -541,19 +717,20 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
                   Container(
                     margin: const EdgeInsets.only(left: 16, top: 16, bottom: 16),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: Colors.blue.shade800,
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(14),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.blue.shade100,
-                            spreadRadius: 1,
-                            blurRadius: 4,
+                            color: Colors.blue.shade200.withOpacity(0.3),
+                            spreadRadius: 0,
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
                           ),
                         ],
                       ),
-                      child: Row(
+                      child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
@@ -561,13 +738,14 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
                             color: Colors.white,
                             size: 14,
                           ),
-                          const SizedBox(width: 4),
+                          SizedBox(width: 6),
                           Text(
                             'EN',
                             style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
                               color: Colors.white,
+                              letterSpacing: 0.5,
                             ),
                           ),
                         ],
@@ -583,28 +761,42 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
                             .asMap()
                             .entries
                             .map((entry) => Container(
-                                  margin: const EdgeInsets.only(bottom: 12),
+                                  margin: const EdgeInsets.only(bottom: 16),
                                   child: Row(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Container(
-                                        width: 24,
-                                        height: 24,
-                                        margin: const EdgeInsets.only(right: 12),
+                                        width: 28,
+                                        height: 28,
+                                        margin: const EdgeInsets.only(right: 14),
                                         decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.circular(12),
-                                          border: Border.all(
-                                            color: Colors.blue.shade100,
-                                            width: 1.5,
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                            colors: [
+                                              Colors.white,
+                                              Colors.blue.shade50,
+                                            ],
                                           ),
+                                          borderRadius: BorderRadius.circular(14),
+                                          border: Border.all(
+                                            color: Colors.blue.shade100.withOpacity(0.5),
+                                            width: 1.0,
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.blue.shade100.withOpacity(0.2),
+                                              blurRadius: 4,
+                                              offset: const Offset(0, 2),
+                                            ),
+                                          ],
                                         ),
                                         child: Center(
                                           child: Text(
                                             '${entry.key + 1}',
                                             style: TextStyle(
                                               fontSize: 14,
-                                              fontWeight: FontWeight.bold,
+                                              fontWeight: FontWeight.w600,
                                               color: Colors.blue.shade800,
                                             ),
                                           ),
@@ -615,15 +807,15 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
                                           entry.value,
                                           style: TextStyle(
                                             fontSize: 16,
-                                            height: 1.5,
+                                            height: 1.6,
                                             color: Colors.blue.shade900,
+                                            letterSpacing: 0.2,
                                           ),
                                         ),
                                       ),
                                     ],
                                   ),
-                                ))
-                            .toList(),
+                                )),
                       ],
                     ),
                   ),
@@ -644,7 +836,7 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
                   width: 1.5,
                 ),
                 boxShadow: [
-                  BoxShadow(
+                  const BoxShadow(
                     color: Colors.white,
                     spreadRadius: 5,
                     blurRadius: 15,
@@ -674,7 +866,7 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
                           ),
                         ],
                       ),
-                      child: Row(
+                      child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
@@ -682,7 +874,7 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
                             color: Colors.white,
                             size: 14,
                           ),
-                          const SizedBox(width: 4),
+                          SizedBox(width: 4),
                           Text(
                             'bn',
                             style: TextStyle(
@@ -726,7 +918,7 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
                   width: 1.5,
                 ),
                 boxShadow: [
-                  BoxShadow(
+                  const BoxShadow(
                     color: Colors.white,
                     spreadRadius: 5,
                     blurRadius: 15,
@@ -755,7 +947,7 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
                           ),
                         ],
                       ),
-                      child: Row(
+                      child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
@@ -763,7 +955,7 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
                             color: Colors.white,
                             size: 14,
                           ),
-                          const SizedBox(width: 4),
+                          SizedBox(width: 4),
                           Text(
                             'Example',
                             style: TextStyle(
@@ -815,7 +1007,7 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
                                 ),
                               ).toList(),
                             );
-                          }).toList(),
+                          }),
                       ],
                     ),
                   ),
