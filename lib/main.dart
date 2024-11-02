@@ -71,6 +71,8 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
       _isLoading = true;
       _error = null;
       _wordData = null;
+      _suggestions = [];
+      _searchController.clear();
     });
 
     try {
@@ -130,7 +132,7 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
 
   Future<void> _fetchSuggestions(String prefix) async {
     if (prefix.length < 2) {
-      setState(() => _suggestions = []);
+      if (mounted) setState(() => _suggestions = []);
       return;
     }
 
@@ -141,13 +143,15 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
       
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
-        setState(() {
-          _suggestions = data.map<String>((item) => item['word'] as String).toList();
-        });
+        if (mounted) {
+          setState(() {
+            _suggestions = data.map<String>((item) => item['word'] as String).toList();
+          });
+        }
       }
     } catch (e) {
       print('Error fetching suggestions: $e');
-      setState(() => _suggestions = []);
+      if (mounted) setState(() => _suggestions = []);
     }
   }
 
@@ -455,55 +459,94 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
         },
         onSelected: (String selection) {
           _searchDictionary(selection);
+          _searchController.clear();
         },
         optionsViewBuilder: (context, onSelected, options) {
-          return Container(
-            margin: const EdgeInsets.only(top: 8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.08),
-                  blurRadius: 16,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              itemCount: options.length,
-              shrinkWrap: true,
-              itemBuilder: (context, index) {
-                final option = options.elementAt(index);
-                return Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () => onSelected(option),
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 12,
-                      ),
-                      child: Text(
-                        option,
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.blue.shade900,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
+          if (options.isEmpty) return const SizedBox.shrink();
+
+          return Align(
+            alignment: Alignment.topLeft,
+            child: Material(
+              color: Colors.transparent,
+              child: Container(
+                width: MediaQuery.of(context).size.width - 48,
+                margin: const EdgeInsets.only(top: 8),
+                constraints: const BoxConstraints(maxHeight: 200),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                    color: Colors.blue.shade50,
+                    width: 1.5,
                   ),
-                );
-              },
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      blurRadius: 8,
+                      spreadRadius: 1,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: ListView.separated(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    shrinkWrap: true,
+                    itemCount: options.length,
+                    separatorBuilder: (context, index) => Divider(
+                      height: 1,
+                      color: Colors.blue.shade50,
+                      indent: 16,
+                      endIndent: 16,
+                    ),
+                    itemBuilder: (context, index) {
+                      final option = options.elementAt(index);
+                      return InkWell(
+                        onTap: () => onSelected(option),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.search_rounded,
+                                size: 18,
+                                color: Colors.blue.shade300,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  option,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.blue.shade900,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ),
+                              Icon(
+                                Icons.north_west_rounded,
+                                size: 16,
+                                color: Colors.blue.shade200,
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ),
             ),
           );
         },
         fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
           return TextField(
-            controller: _searchController,
+            controller: controller,
             focusNode: focusNode,
             style: TextStyle(
               fontSize: 16,
@@ -547,8 +590,17 @@ class _DictionaryHomePageState extends State<DictionaryHomePage> {
                 ),
               ),
             ),
-            onChanged: _debounceSearch,
-            onSubmitted: (value) => _searchDictionary(value.trim()),
+            onChanged: (value) {
+              _debounceSearch(value);
+              controller.value = TextEditingValue(
+                text: value,
+                selection: TextSelection.collapsed(offset: value.length),
+              );
+            },
+            onSubmitted: (value) {
+              _searchDictionary(value.trim());
+              controller.clear();
+            },
           );
         },
       ),

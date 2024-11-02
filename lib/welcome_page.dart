@@ -186,6 +186,7 @@ class _WelcomePageState extends State<WelcomePage> with SingleTickerProviderStat
                 ),
                 const SizedBox(height: 24),
                 Container(
+                  width: 320,
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
@@ -228,10 +229,40 @@ class _WelcomePageState extends State<WelcomePage> with SingleTickerProviderStat
                           ),
                         ),
                       ),
-                      _buildInfoRow(
-                        Icons.email_outlined,
-                        'a.a.mamun595@gmail.com',
-                        'Contact Email',
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Colors.blue.shade400,
+                                  Colors.blue.shade600,
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Icon(
+                              Icons.email_outlined,
+                              size: 20,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'a.a.mamun595@gmail.com',
+                              style: TextStyle(
+                                fontSize: 15,
+                                color: Colors.blue.shade900,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
